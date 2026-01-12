@@ -3,21 +3,205 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const path = require('path');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const User = require('./models/User');
+const Presentation = require('./models/Presentation');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET || 'seu-secret-key-aqui-mude-em-producao';
+
+// Conectar ao MongoDB
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('✅ MongoDB conectado'))
+  .catch(err => console.error('❌ Erro ao conectar MongoDB:', err));
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
+
+// Middleware de autenticação
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Token não fornecido' });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: 'Token inválido' });
+    }
+    req.user = user;
+    next();
+  });
+};
 
 // Rota principal para servir o HTML
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// ===== ROTAS DE AUTENTICAÇÃO =====
+
+// Registrar usuário
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { email, username, password } = req.body;
+
+    // Validações
+    if (!email || !username || !password) {
+      return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'A senha deve ter no mínimo 6 caracteres' });
+    }
+
+    // Verificar se usuário já existe
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email ou usuário já cadastrado' });
+    }
+
+    // Hash da senha
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Criar usuário
+    const user = new User({
+      email,
+      username,
+      password: hashedPassword
+    });
+
+    await user.save();
+
+    res.status(201).json({ message: 'Usuário criado com sucesso' });
+  } catch (error) {
+    console.error('Erro ao registrar:', error);
+    res.status(500).json({ error: 'Erro ao criar usuário' });
+  }
+});
+
+// Login
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Buscar usuário
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(401).json({ error: 'Usuário ou senha incorretos' });
+    }
+
+    // Verificar senha
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(401).json({ error: 'Usuário ou senha incorretos' });
+    }
+
+    // Gerar token
+    const token = jwt.sign(
+      { userId: user._id, username: user.username },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      token,
+      userId: user._id,
+      username: user.username
+    });
+  } catch (error) {
+    console.error('Erro ao fazer login:', error);
+    res.status(500).json({ error: 'Erro ao fazer login' });
+  }
+});
+
+// ===== ROTAS DE APRESENTAÇÕES =====
+
+// Salvar apresentação
+app.post('/api/presentations', authenticateToken, async (req, res) => {
+  try {
+    const { title, originalText, elements } = req.body;
+
+    const presentation = new Presentation({
+      userId: req.user.userId,
+      title,
+      originalText,
+      elements
+    });
+
+    await presentation.save();
+
+    res.status(201).json({
+      message: 'Apresentação salva com sucesso',
+      presentationId: presentation._id
+    });
+  } catch (error) {
+    console.error('Erro ao salvar apresentação:', error);
+    res.status(500).json({ error: 'Erro ao salvar apresentação' });
+  }
+});
+
+// Listar apresentações do usuário
+app.get('/api/presentations', authenticateToken, async (req, res) => {
+  try {
+    const presentations = await Presentation.find({ userId: req.user.userId })
+      .sort({ createdAt: -1 })
+      .select('title createdAt updatedAt');
+
+    res.json(presentations);
+  } catch (error) {
+    console.error('Erro ao listar apresentações:', error);
+    res.status(500).json({ error: 'Erro ao listar apresentações' });
+  }
+});
+
+// Obter uma apresentação específica
+app.get('/api/presentations/:id', authenticateToken, async (req, res) => {
+  try {
+    const presentation = await Presentation.findOne({
+      _id: req.params.id,
+      userId: req.user.userId
+    });
+
+    if (!presentation) {
+      return res.status(404).json({ error: 'Apresentação não encontrada' });
+    }
+
+    res.json(presentation);
+  } catch (error) {
+    console.error('Erro ao buscar apresentação:', error);
+    res.status(500).json({ error: 'Erro ao buscar apresentação' });
+  }
+});
+
+// Deletar apresentação
+app.delete('/api/presentations/:id', authenticateToken, async (req, res) => {
+  try {
+    const result = await Presentation.deleteOne({
+      _id: req.params.id,
+      userId: req.user.userId
+    });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Apresentação não encontrada' });
+    }
+
+    res.json({ message: 'Apresentação deletada com sucesso' });
+  } catch (error) {
+    console.error('Erro ao deletar apresentação:', error);
+    res.status(500).json({ error: 'Erro ao deletar apresentação' });
+  }
+});
+
 // Rota para processar o texto com Deepseek
-app.post('/api/process', async (req, res) => {
+app.post('/api/process', authenticateToken, async (req, res) => {
   try {
     const { text } = req.body;
     

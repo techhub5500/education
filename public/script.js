@@ -1,10 +1,18 @@
 // Estado da aplicação
 let currentContent = null;
 let currentElementIndex = 0;
-let currentLineIndex = 0; // Controla qual linha do elemento atual está sendo mostrada
+let currentLineIndex = 0;
 let isPresentationMode = false;
 let charts = [];
-let currentElementContainer = null; // Container do elemento atual
+let currentElementContainer = null;
+let currentPresentationId = null; // ID da apresentação atual
+let userToken = localStorage.getItem('token');
+let currentUsername = localStorage.getItem('username');
+
+// Verificar autenticação
+if (!userToken) {
+    window.location.href = '/auth.html';
+}
 
 // Elementos do DOM
 const elements = {
@@ -84,17 +92,24 @@ async function processContent() {
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userToken}`
             },
             body: JSON.stringify({ text })
         });
 
         if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                localStorage.clear();
+                window.location.href = '/auth.html';
+                return;
+            }
             throw new Error('Erro na resposta do servidor');
         }
 
         const data = await response.json();
         currentContent = data;
+        currentPresentationId = null; // Nova apresentação
         
         showStatus('✅ Conteúdo gerado com sucesso!', 'success');
         setupTimeControls();
@@ -501,6 +516,214 @@ document.addEventListener('webkitfullscreenchange', () => {
     }
 });
 
+// ========================================
+// GERENCIAMENTO DE APRESENTAÇÕES
+// ========================================
+
+// Salvar apresentação
+async function savePresentation() {
+    if (!currentContent || !currentContent.elements || currentContent.elements.length === 0) {
+        showStatus('Nenhuma apresentação para salvar!', 'error');
+        return;
+    }
+
+    const title = prompt('Digite um título para esta apresentação:');
+    if (!title || title.trim() === '') {
+        return;
+    }
+
+    try {
+        const apiUrl = window.location.origin + '/api/presentations';
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            },
+            body: JSON.stringify({
+                title: title.trim(),
+                originalText: elements.textInput.value,
+                elements: currentContent.elements
+            })
+        });
+
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                localStorage.clear();
+                window.location.href = '/auth.html';
+                return;
+            }
+            throw new Error('Erro ao salvar apresentação');
+        }
+
+        const data = await response.json();
+        currentPresentationId = data.presentation._id;
+        showStatus('✅ Apresentação salva com sucesso!', 'success');
+        loadPresentationsList();
+    } catch (error) {
+        console.error('Erro ao salvar:', error);
+        showStatus('❌ Erro ao salvar apresentação', 'error');
+    }
+}
+
+// Carregar lista de apresentações
+async function loadPresentationsList() {
+    try {
+        const apiUrl = window.location.origin + '/api/presentations';
+        const response = await fetch(apiUrl, {
+            headers: {
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                localStorage.clear();
+                window.location.href = '/auth.html';
+                return;
+            }
+            throw new Error('Erro ao carregar apresentações');
+        }
+
+        const presentations = await response.json();
+        displayPresentationsList(presentations);
+    } catch (error) {
+        console.error('Erro ao carregar lista:', error);
+        showStatus('❌ Erro ao carregar apresentações', 'error');
+    }
+}
+
+// Exibir lista de apresentações
+function displayPresentationsList(presentations) {
+    const listContainer = document.getElementById('presentations-list');
+    if (!listContainer) return;
+
+    if (presentations.length === 0) {
+        listContainer.innerHTML = '<p class="no-presentations">Nenhuma apresentação salva ainda.</p>';
+        return;
+    }
+
+    listContainer.innerHTML = presentations.map(pres => `
+        <div class="presentation-card" data-id="${pres._id}">
+            <div class="presentation-info">
+                <h3>${pres.title}</h3>
+                <p class="presentation-date">${new Date(pres.createdAt).toLocaleString('pt-BR')}</p>
+                <p class="presentation-elements">${pres.elements.length} elementos</p>
+            </div>
+            <div class="presentation-actions">
+                <button class="btn-load" onclick="loadPresentation('${pres._id}')">📂 Carregar</button>
+                <button class="btn-delete" onclick="deletePresentation('${pres._id}')">🗑️ Deletar</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Carregar apresentação específica
+async function loadPresentation(id) {
+    try {
+        const apiUrl = window.location.origin + `/api/presentations/${id}`;
+        const response = await fetch(apiUrl, {
+            headers: {
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                localStorage.clear();
+                window.location.href = '/auth.html';
+                return;
+            }
+            throw new Error('Erro ao carregar apresentação');
+        }
+
+        const presentation = await response.json();
+        
+        // Preencher textarea com texto original
+        elements.textInput.value = presentation.originalText;
+        
+        // Definir conteúdo atual
+        currentContent = {
+            elements: presentation.elements
+        };
+        currentPresentationId = presentation._id;
+        
+        // Configurar controles
+        setupTimeControls();
+        
+        // Fechar biblioteca
+        toggleLibrary();
+        
+        showStatus(`✅ Apresentação "${presentation.title}" carregada!`, 'success');
+    } catch (error) {
+        console.error('Erro ao carregar apresentação:', error);
+        showStatus('❌ Erro ao carregar apresentação', 'error');
+    }
+}
+
+// Deletar apresentação
+async function deletePresentation(id) {
+    if (!confirm('Tem certeza que deseja deletar esta apresentação?')) {
+        return;
+    }
+
+    try {
+        const apiUrl = window.location.origin + `/api/presentations/${id}`;
+        const response = await fetch(apiUrl, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                localStorage.clear();
+                window.location.href = '/auth.html';
+                return;
+            }
+            throw new Error('Erro ao deletar apresentação');
+        }
+
+        showStatus('✅ Apresentação deletada!', 'success');
+        loadPresentationsList();
+        
+        // Se era a apresentação atual, limpar
+        if (currentPresentationId === id) {
+            currentContent = null;
+            currentPresentationId = null;
+            resetPresentation();
+        }
+    } catch (error) {
+        console.error('Erro ao deletar:', error);
+        showStatus('❌ Erro ao deletar apresentação', 'error');
+    }
+}
+
+// Toggle da biblioteca
+function toggleLibrary() {
+    const library = document.getElementById('library-panel');
+    if (!library) return;
+    
+    const isVisible = library.classList.contains('visible');
+    
+    if (isVisible) {
+        library.classList.remove('visible');
+    } else {
+        library.classList.add('visible');
+        loadPresentationsList();
+    }
+}
+
+// Logout
+function logout() {
+    if (confirm('Tem certeza que deseja sair?')) {
+        localStorage.clear();
+        window.location.href = '/auth.html';
+    }
+}
+
 // Log inicial
 console.log('🎨 Dashboard Educacional carregado!');
 console.log('📝 Digite seu conteúdo e deixe a IA criar visualizações incríveis!');
+console.log(`👤 Usuário: ${currentUsername}`);

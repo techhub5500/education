@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Dashboard Educacional</title>
+    <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-box">
+            <h1>📚 Dashboard Educacional</h1>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="form-container">
+                <h2>Entrar</h2>
+                <form id="loginFormElement">
+                    <div class="input-group">
+                        <label for="loginUsername">Usuário</label>
+                        <input type="text" id="loginUsername" required placeholder="Seu nome de usuário">
+                    </div>
+                    <div class="input-group">
+                        <label for="loginPassword">Senha</label>
+                        <input type="password" id="loginPassword" required placeholder="Sua senha">
+                    </div>
+                    <button type="submit" class="btn-primary">Entrar</button>
+                    <p class="switch-form">
+                        Não tem conta? <a href="#" id="showRegister">Criar conta</a>
+                    </p>
+                </form>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="form-container hidden">
+                <h2>Criar Conta</h2>
+                <form id="registerFormElement">
+                    <div class="input-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" required placeholder="seu@email.com">
+                    </div>
+                    <div class="input-group">
+                        <label for="registerUsername">Usuário</label>
+                        <input type="text" id="registerUsername" required placeholder="Escolha um nome de usuário">
+                    </div>
+                    <div class="input-group">
+                        <label for="registerPassword">Senha</label>
+                        <input type="password" id="registerPassword" required placeholder="Mínimo 6 caracteres">
+                    </div>
+                    <button type="submit" class="btn-primary">Criar Conta</button>
+                    <p class="switch-form">
+                        Já tem conta? <a href="#" id="showLogin">Fazer login</a>
+                    </p>
+                </form>
+            </div>
+
+            <div id="authMessage" class="auth-message hidden"></div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>

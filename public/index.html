@@ -11,6 +11,15 @@
 </head>
 <body>
     <div class="container">
+        <!-- Header com username e logout -->
+        <div class="app-header">
+            <span id="username-display" class="username-display"></span>
+            <div class="header-actions">
+                <button onclick="toggleLibrary()" class="btn-library">📂 Minhas Apresentações</button>
+                <button onclick="logout()" class="btn-logout">🚪 Sair</button>
+            </div>
+        </div>
+
         <!-- Painel de Controle -->
         <div class="control-panel" id="controlPanel">
             <h1>📚 Dashboard Educacional</h1>
@@ -23,9 +32,14 @@
                     rows="6"
                 ></textarea>
                 
-                <button id="processBtn" class="btn-primary">
-                    ✨ Gerar Conteúdo Visual
-                </button>
+                <div class="button-group">
+                    <button id="processBtn" class="btn-primary">
+                        ✨ Gerar Conteúdo Visual
+                    </button>
+                    <button onclick="savePresentation()" class="btn-save">
+                        💾 Salvar Apresentação
+                    </button>
+                </div>
             </div>
 
             <div id="statusMessage" class="status-message hidden"></div>
@@ -67,8 +81,26 @@
                 </div>
             </div>
         </div>
+
+        <!-- Painel Biblioteca de Apresentações -->
+        <div id="library-panel" class="library-panel">
+            <div class="library-header">
+                <h2>📂 Minhas Apresentações</h2>
+                <button onclick="toggleLibrary()" class="btn-close">✖</button>
+            </div>
+            <div id="presentations-list" class="presentations-list">
+                <p class="loading">Carregando...</p>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // Exibir nome do usuário
+        const username = localStorage.getItem('username');
+        if (username) {
+            document.getElementById('username-display').textContent = `👤 ${username}`;
+        }
+    </script>
 </body>
 </html>
