@@ -83,7 +83,11 @@ app.post('/api/auth/register', async (req, res) => {
     res.status(201).json({ message: 'Usuário criado com sucesso' });
   } catch (error) {
     console.error('Erro ao registrar:', error);
-    res.status(500).json({ error: 'Erro ao criar usuário' });
+    console.error('Stack:', error.stack);
+    res.status(500).json({ 
+      error: 'Erro ao criar usuário',
+      details: error.message 
+    });
   }
 });
 
@@ -140,7 +144,7 @@ app.post('/api/presentations', authenticateToken, async (req, res) => {
 
     res.status(201).json({
       message: 'Apresentação salva com sucesso',
-      presentationId: presentation._id
+      presentation: presentation
     });
   } catch (error) {
     console.error('Erro ao salvar apresentação:', error);
@@ -153,9 +157,18 @@ app.get('/api/presentations', authenticateToken, async (req, res) => {
   try {
     const presentations = await Presentation.find({ userId: req.user.userId })
       .sort({ createdAt: -1 })
-      .select('title createdAt updatedAt');
+      .select('title createdAt updatedAt elements');
 
-    res.json(presentations);
+    // Adicionar contagem de elementos
+    const presentationsWithCount = presentations.map(p => ({
+      _id: p._id,
+      title: p.title,
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt,
+      elements: p.elements || []
+    }));
+
+    res.json(presentationsWithCount);
   } catch (error) {
     console.error('Erro ao listar apresentações:', error);
     res.status(500).json({ error: 'Erro ao listar apresentações' });
