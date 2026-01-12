@@ -105,6 +105,24 @@ Esta ferramenta é ideal para criar vídeos educacionais:
 
 Para obter sua chave da API Deepseek: https://platform.deepseek.com/
 
-## 📄 Licença
+## � Deploy
+
+### Deploy no Render (Recomendado)
+
+A aplicação está pronta para deploy no Render com domínio gratuito.
+
+**Guias disponíveis:**
+- [DEPLOY-RENDER.md](DEPLOY-RENDER.md) - Guia completo passo a passo
+- [DEPLOY-QUICK.md](DEPLOY-QUICK.md) - Resumo rápido dos comandos
+
+**Após o deploy, sua aplicação estará em:**
+```
+https://seu-app.onrender.com
+```
+
+---
+
+## 📝 Licença
 
 MIT
+
