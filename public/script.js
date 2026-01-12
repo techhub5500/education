@@ -31,6 +31,24 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+// Listener para toque na tela (mobile)
+elements.contentDisplay.addEventListener('click', (event) => {
+    if (!isPresentationMode) return;
+    
+    const clickX = event.clientX || event.touches?.[0]?.clientX;
+    const screenWidth = window.innerWidth;
+    const clickPosition = clickX / screenWidth;
+    
+    // Lado esquerdo (0 a 0.3) = Voltar
+    if (clickPosition < 0.3) {
+        showPreviousElement();
+    }
+    // Lado direito (0.3 a 1.0) = Avançar
+    else {
+        showNextElement();
+    }
+});
+
 // Função para processar o conteúdo
 async function processContent() {
     const text = elements.textInput.value.trim();
@@ -127,20 +145,7 @@ function setupTimeControls() {
 
 // Obter descrição do elemento
 function getElementDescription(element) {
-    switch (element.type) {
-        case 'text':
-            return `Texto: ${element.content.substring(0, 30)}...`;
-        case 'chart':
-            return `Gráfico: ${element.title || element.chartType}`;
-        case 'table':
-            return 'Tabela';
-        case 'list':
-            return 'Lista';
-        case 'math':
-            return `Matemática: ${element.content}`;
-        default:
-            return 'Elemento';
-    }
+    return `Texto: ${element.content.substring(0, 40)}...`;
 }
 
 // Atualizar duração da animação
@@ -206,38 +211,36 @@ function showNextElement() {
     currentElementIndex++;
 }
 
+// Mostrar elemento anterior
+function showPreviousElement() {
+    if (!isPresentationMode || !currentContent) return;
+    
+    // Se está no primeiro, não faz nada
+    if (currentElementIndex === 0) return;
+    
+    // Remove o último elemento renderizado
+    const lastChild = elements.contentDisplay.lastElementChild;
+    if (lastChild) {
+        lastChild.remove();
+    }
+    
+    currentElementIndex--;
+    
+    // Atualizar barra de progresso
+    const progress = (currentElementIndex / currentContent.elements.length) * 100;
+    elements.progressFill.style.width = `${progress}%`;
+}
+
 // Renderizar elemento
 function renderElement(element) {
     const container = document.createElement('div');
-    container.className = 'content-element';
+    container.className = 'content-element fade-slide-animation';
     
-    // Aplicar animações baseadas no tipo
-    const animationDuration = element.animation?.duration || (element.type === 'text' ? 1.5 : 2.5);
+    // Aplicar animações
+    const animationDuration = element.animation?.duration || 1.5;
     container.style.setProperty('--animation-duration', `${animationDuration}s`);
     
-    switch (element.type) {
-        case 'text':
-            container.classList.add('fade-slide-animation');
-            renderText(element, container);
-            break;
-        case 'chart':
-            renderChart(element, container, animationDuration);
-            break;
-        case 'table':
-            container.classList.add('fade-slide-animation');
-            renderTable(element, container);
-            break;
-        case 'list':
-            container.classList.add('fade-slide-animation');
-            renderList(element, container);
-            break;
-        case 'math':
-            container.classList.add('fade-slide-animation');
-            renderMath(element, container);
-            break;
-        default:
-            container.innerHTML = `<p>${element.content}</p>`;
-    }
+    renderText(element, container);
     
     elements.contentDisplay.appendChild(container);
     
@@ -251,6 +254,9 @@ function renderText(element, container) {
     const highlights = element.highlights || [];
     const colors = ['highlight-yellow', 'highlight-green', 'highlight-pink', 'highlight-blue'];
     
+    // Preservar quebras de linha
+    content = content.replace(/\n/g, '<br>');
+    
     highlights.forEach((word, index) => {
         const color = colors[index % colors.length];
         const regex = new RegExp(`(${escapeRegex(word)})`, 'gi');
@@ -258,148 +264,6 @@ function renderText(element, container) {
     });
     
     container.innerHTML = `<div class="content-text">${content}</div>`;
-}
-
-// Renderizar gráfico com animação progressiva
-function renderChart(element, container, animationDuration) {
-    const { chartType, data, title } = element;
-    
-    if (title) {
-        const titleElement = document.createElement('div');
-        titleElement.className = 'chart-title fade-slide-animation';
-        titleElement.style.setProperty('--animation-duration', `${animationDuration * 0.3}s`);
-        titleElement.textContent = title;
-        container.appendChild(titleElement);
-    }
-    
-    const chartContainer = document.createElement('div');
-    chartContainer.className = 'chart-container';
-    
-    const canvas = document.createElement('canvas');
-    chartContainer.appendChild(canvas);
-    container.appendChild(chartContainer);
-    
-    // Cores hand-drawn
-    const colors = [
-        'rgba(255, 99, 132, 0.7)',
-        'rgba(54, 162, 235, 0.7)',
-        'rgba(255, 206, 86, 0.7)',
-        'rgba(75, 192, 192, 0.7)',
-        'rgba(153, 102, 255, 0.7)',
-        'rgba(255, 159, 64, 0.7)'
-    ];
-    
-    const borderColors = colors.map(c => c.replace('0.7', '1'));
-    
-    // Configuração de animação do Chart.js
-    const animationConfig = {
-        duration: animationDuration * 1000,
-        easing: 'easeInOutQuart',
-        delay: (context) => {
-            let delay = 0;
-            if (context.type === 'data' && context.mode === 'default') {
-                delay = context.dataIndex * (animationDuration * 100);
-            }
-            return delay;
-        }
-    };
-    
-    const chartConfig = {
-        type: chartType || 'bar',
-        data: {
-            labels: data.labels,
-            datasets: [{
-                label: title || 'Dados',
-                data: data.values,
-                backgroundColor: colors.slice(0, data.values.length),
-                borderColor: borderColors.slice(0, data.values.length),
-                borderWidth: 3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: animationConfig,
-            plugins: {
-                legend: {
-                    display: chartType === 'pie',
-                    labels: {
-                        font: {
-                            family: "'Patrick Hand', cursive",
-                            size: 16
-                        }
-                    }
-                }
-            },
-            scales: chartType !== 'pie' ? {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        font: {
-                            family: "'Patrick Hand', cursive",
-                            size: 14
-                        }
-                    }
-                },
-                x: {
-                    ticks: {
-                        font: {
-                            family: "'Patrick Hand', cursive",
-                            size: 14
-                        }
-                    }
-                }
-            } : {}
-        }
-    };
-    
-    const chart = new Chart(canvas, chartConfig);
-    charts.push(chart);
-}
-
-// Renderizar tabela
-function renderTable(element, container) {
-    const { headers, rows } = element.data;
-    
-    let html = '<div class="table-container"><table>';
-    
-    // Cabeçalho
-    html += '<thead><tr>';
-    headers.forEach(header => {
-        html += `<th>${header}</th>`;
-    });
-    html += '</tr></thead>';
-    
-    // Linhas
-    html += '<tbody>';
-    rows.forEach(row => {
-        html += '<tr>';
-        row.forEach(cell => {
-            html += `<td>${cell}</td>`;
-        });
-        html += '</tr>';
-    });
-    html += '</tbody></table></div>';
-    
-    container.innerHTML = html;
-}
-
-// Renderizar lista
-function renderList(element, container) {
-    const items = element.items || [];
-    
-    let html = '<div class="list-container"><ul>';
-    items.forEach(item => {
-        html += `<li>${item}</li>`;
-    });
-    html += '</ul></div>';
-    
-    container.innerHTML = html;
-}
-
-// Renderizar expressão matemática
-function renderMath(element, container) {
-    container.innerHTML = `<div class="math-expression">${element.content}</div>`;
 }
 
 // Escapar caracteres especiais para regex

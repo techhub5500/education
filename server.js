@@ -34,37 +34,40 @@ app.post('/api/process', async (req, res) => {
 
 CONTEXTO IMPORTANTE:
 - O texto fornecido será NARRADO por uma pessoa
-- Você deve criar elementos visuais que ACOMPANHEM e REFORCEM a narração
-- Os visuais aparecem enquanto a pessoa fala
-- Priorize clareza e impacto visual
+- Você deve criar elementos visuais em TEXTO que ACOMPANHEM e REFORCEM a narração
+- Os visuais aparecem enquanto a pessoa fala em um formato vertical (celular)
+- Priorize clareza, impacto visual e legibilidade
+- Use EMOJIS, SETAS, SÍMBOLOS e BULLET POINTS para tornar visualmente atraente
 
-TIPOS DE ELEMENTOS:
-1. "text" - Frases-chave, conceitos importantes, definições
-2. "chart" - APENAS para dados numéricos concretos e comparações quantitativas
-3. "table" - Comparações lado a lado, antes/depois, pros/contras
-4. "list" - Passos, pontos principais, sequências
+TIPO DE ELEMENTO:
+- "text" - ÚNICO tipo disponível, mas você deve torná-lo VISUALMENTE RICO
 
 REGRAS DE OURO:
-✅ Use "text" com highlights para conceitos-chave e frases de impacto
-✅ Use "list" para enumerar pontos, passos ou estratégias
-✅ Use "table" para comparar duas ou mais opções/cenários
-❌ SÓ use "chart" se houver dados numéricos REAIS e relevantes
-❌ NÃO invente gráficos se não houver dados concretos para visualizar
-❌ NÃO force visualizações que não agregam valor
+✅ Use EMOJIS para representar conceitos (💰 dinheiro, 📈 crescimento, ⚠️ alerta, ✅ correto, ❌ errado)
+✅ Use SETAS para fluxos e progressões (→ ➜ ⇒ ↗️ ↘️)
+✅ Use BULLET POINTS para listas (• ◆ ▸ ✦)
+✅ Use SÍMBOLOS especiais (★ ⭐ ⚡ 🎯 💡 🔥)
+✅ Quebre textos longos em múltiplos elementos menores
+✅ Para comparações use format: "Rico ➜ ... | Pobre ➜ ..."
+✅ Para sequências use: "1️⃣ ... \n 2️⃣ ... \n 3️⃣ ..."
+✅ Destaque números e valores importantes
+❌ NÃO crie textos muito longos - máximo 3-4 linhas por elemento
+❌ NÃO use apenas texto puro - sempre adicione elementos visuais
 
 ANÁLISE DO TEXTO:
 1. Identifique os 3-5 pontos principais
-2. Decida qual formato visual melhor representa cada ponto
-3. Destaque palavras-chave e números importantes
-4. Crie elementos que complementem a fala, não que compitam com ela
+2. Quebre em blocos de texto curtos e impactantes
+3. Destaque palavras-chave, números e conceitos importantes
+4. Use listas para passos ou enumerações
+5. Crie elementos que complementem a fala, não que compitam com ela
 
 ESTRUTURA DA RESPOSTA:
 {
   "elements": [
     {
-      "type": "text|list|table|chart",
-      "content": "conteúdo do elemento",
-      "highlights": ["palavras", "para", "destacar"],
+      "type": "text|list",
+      "content": "conteúdo curto e impactante",
+      "highlights": ["palavras", "números", "conceitos"],
       "animation": {
         "duration": 1.5
       }
@@ -74,23 +77,25 @@ ESTRUTURA DA RESPOSTA:
 
 EXEMPLOS DE USO CORRETO:
 
-Texto sobre estratégia financeira (SEM dados numéricos):
-→ Use "text" para conceito principal + "list" para passos
+Texto sobre estratégia financeira:
+→ Element 1 (text): "Por que os ricos pagam menos impostos?"
+→ Element 2 (text): "Empréstimo não é renda = sem impostos"
+→ Element 3 (list): Estratégias que eles usam
 
 Texto com comparação "rico vs pobre":
-→ Use "table" com 2 colunas comparando comportamentos
+→ Element 1 (text): "Rico: patrimônio | Pobre: salário"
+→ Element 2 (text): "Rico: ativos que geram renda"
+→ Element 3 (text): "Pobre: troca tempo por dinheiro"
 
-Texto com dados "gastei R$100 e agora R$150":
-→ Use "chart" tipo "bar" com valores reais
+Texto com números:
+→ Element (text): "R$ 100 → R$ 150 em 30 dias" (destacar valores)
 
-Texto conceitual sobre mindset:
-→ Use "text" destacando frases de impacto
+Texto conceitual:
+→ Element (text): Frase de impacto com palavras-chave destacadas
 
 DURAÇÃO DAS ANIMAÇÕES:
 - text: 1.2 a 2.0 segundos
-- list: 1.5 a 2.5 segundos  
-- table: 2.0 a 3.0 segundos
-- chart: 2.5 a 3.5 segundos
+- list: 1.5 a 2.5 segundos
 
 Retorne APENAS o JSON, sem texto adicional.`;
 
