@@ -1,0 +1,832 @@
+/* Importar fontes com estilo hand-drawn */
+@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Caveat:wght@400;700&display=swap');
+
+:root {
+    --primary-color: #4a90e2;
+    --secondary-color: #f39c12;
+    --success-color: #27ae60;
+    --danger-color: #e74c3c;
+    --bg-light: #fef9f3;
+    --bg-white: #ffffff;
+    --text-dark: #2c3e50;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --highlight-yellow: #fff176;
+    --highlight-green: #aed581;
+    --highlight-pink: #f48fb1;
+    --highlight-blue: #81d4fa;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent; /* Remove destaque azul no toque em iOS */
+    -webkit-touch-callout: none; /* Desabilita callout em iOS */
+}
+
+body {
+    font-family: 'Patrick Hand', cursive;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+    height: calc(100vh - 40px);
+    align-items: center;
+}
+
+/* Painel de Controle */
+.control-panel {
+    background: var(--bg-white);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: var(--shadow);
+    overflow-y: auto;
+    border: 3px solid var(--text-dark);
+}
+
+.control-panel h1 {
+    font-family: 'Caveat', cursive;
+    font-size: 2em;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    text-align: center;
+    text-decoration: underline;
+    text-decoration-style: wavy;
+    text-decoration-color: var(--primary-color);
+}
+
+.input-section {
+    margin-bottom: 20px;
+}
+
+.input-section label {
+    display: block;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: var(--text-dark);
+}
+
+#textInput {
+    width: 100%;
+    padding: 15px;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.1em;
+    border: 3px solid var(--text-dark);
+    border-radius: 10px;
+    resize: vertical;
+    background: var(--bg-light);
+    transition: all 0.3s ease;
+    -webkit-appearance: none; /* Remove estilo padrão iOS */
+    appearance: none;
+}
+
+#textInput:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+/* Botões */
+.btn-primary, .btn-play, .btn-pause, .btn-reset {
+    width: 100%;
+    padding: 15px;
+    font-family: 'Caveat', cursive;
+    font-size: 1.3em;
+    font-weight: bold;
+    border: 3px solid var(--text-dark);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    -webkit-appearance: none; /* Remove estilo padrão iOS */
+    appearance: none;
+    touch-action: manipulation; /* Melhora resposta ao toque */
+    user-select: none; /* Previne seleção de texto */
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover, .btn-primary:active {
+    background: #357abd;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-play {
+    background: var(--success-color);
+    color: white;
+}
+
+.btn-pause {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.btn-reset {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-play:hover, .btn-play:active,
+.btn-pause:hover, .btn-pause:active,
+.btn-reset:hover, .btn-reset:active {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Status Message */
+.status-message {
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+    border: 3px solid var(--text-dark);
+    font-size: 1.1em;
+}
+
+.status-message.success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-message.error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-message.loading {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Controles de Tempo */
+.time-controls {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 3px dashed var(--text-dark);
+}
+
+.time-controls h3 {
+    font-family: 'Caveat', cursive;
+    font-size: 1.5em;
+    margin-bottom: 15px;
+}
+
+.timing-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.timing-item {
+    background: var(--bg-light);
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid var(--text-dark);
+    margin-bottom: 10px;
+}
+
+.timing-item label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 1em;
+}
+
+.timing-item input {
+    width: 100%;
+    padding: 8px;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1em;
+    border: 2px solid var(--text-dark);
+    border-radius: 5px;
+    -webkit-appearance: none; /* Remove estilo padrão iOS */
+    appearance: none;
+}
+
+.timing-item input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 30px;
+    background: var(--bg-light);
+    border: 3px solid var(--text-dark);
+    border-radius: 15px;
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success-color), var(--primary-color));
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.keyboard-hint {
+    background: var(--bg-light);
+    border: 2px dashed var(--text-dark);
+    border-radius: 10px;
+    padding: 12px;
+    margin: 15px 0;
+    text-align: center;
+    font-size: 1.1em;
+}
+
+.keyboard-hint strong {
+    background: var(--primary-color);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 5px;
+    font-family: 'Caveat', cursive;
+    font-size: 1.2em;
+}
+
+/* Área de Apresentação */
+.presentation-area {
+    background: var(--bg-white);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 3px solid var(--text-dark);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.canvas-container {
+    /* Proporção 9:16 - Formato de celular para vídeo vertical */
+    width: 405px;  /* 9 unidades */
+    height: 720px; /* 16 unidades */
+    max-height: calc(100vh - 100px);
+    background: var(--bg-white);
+    border: 4px solid var(--text-dark);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+}
+
+.content-display {
+    min-height: 100%;
+    padding: 20px;
+}
+
+.placeholder {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-dark);
+}
+
+.placeholder h2 {
+    font-family: 'Caveat', cursive;
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.placeholder p {
+    font-size: 1.1em;
+    margin: 10px 0;
+}
+
+/* Elementos de Conteúdo */
+.content-element {
+    margin-bottom: 30px;
+    padding: 15px;
+    background: var(--bg-light);
+    border-radius: 15px;
+    border: 3px solid var(--text-dark);
+}
+
+/* Animação Fade Slide (da esquerda para direita) */
+.fade-slide-animation {
+    animation: fadeSlideIn var(--animation-duration, 1.5s) ease-out forwards;
+}
+
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.content-text {
+    font-size: 1.4em;
+    line-height: 1.5;
+    color: var(--text-dark);
+}
+
+.highlight {
+    position: relative;
+    padding: 2px 6px;
+    font-weight: bold;
+}
+
+.highlight-yellow {
+    background: var(--highlight-yellow);
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.highlight-green {
+    background: var(--highlight-green);
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.highlight-pink {
+    background: var(--highlight-pink);
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.highlight-blue {
+    background: var(--highlight-blue);
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin-top: 15px;
+}
+
+.chart-title {
+    font-family: 'Caveat', cursive;
+    font-size: 1.6em;
+    text-align: center;
+    margin-bottom: 10px;
+    text-decoration: underline;
+    text-decoration-style: wavy;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 3px solid var(--text-dark);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 2px solid var(--text-dark);
+    font-size: 1em;
+}
+
+th {
+    background: var(--primary-color);
+    color: white;
+    font-family: 'Caveat', cursive;
+    font-size: 1.3em;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:nth-child(even) {
+    background: var(--bg-light);
+}
+
+.list-container {
+    margin-top: 15px;
+}
+
+.list-container ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.list-container li {
+    font-size: 1.2em;
+    padding: 8px 0;
+    padding-left: 35px;
+    position: relative;
+}
+
+.list-container li:before {
+    content: "✏️";
+    position: absolute;
+    left: 0;
+    font-size: 1em;
+}
+
+.math-expression {
+    font-size: 2em;
+    text-align: center;
+    padding: 20px;
+    background: var(--bg-light);
+    border: 3px dashed var(--text-dark);
+    border-radius: 15px;
+    margin: 15px 0;
+}
+
+/* Utility Classes */
+.hidden {
+    display: none;
+}
+
+/* Scrollbar customizada para o canvas */
+.canvas-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.canvas-container::-webkit-scrollbar-track {
+    background: var(--bg-light);
+    border-radius: 10px;
+}
+
+.canvas-container::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+.canvas-container::-webkit-scrollbar-thumb:hover {
+    background: #357abd;
+}
+
+/* Scrollbar padrão */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-light);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #357abd;
+}
+
+/* Responsividade */
+@media (max-width: 1200px) {
+    .container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+    }
+    
+    .control-panel {
+        max-height: 400px;
+    }
+}
+
+/* Responsividade para Tablets */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        grid-template-columns: 1fr;
+        height: auto;
+        gap: 15px;
+    }
+
+    .control-panel {
+        padding: 20px;
+        max-height: none;
+        border-radius: 15px;
+    }
+
+    .control-panel h1 {
+        font-size: 1.8em;
+    }
+
+    #textInput {
+        font-size: 1em;
+        padding: 12px;
+    }
+
+    .btn-primary, .btn-play, .btn-pause, .btn-reset {
+        padding: 12px;
+        font-size: 1.2em;
+    }
+
+    .presentation-area {
+        padding: 15px;
+        height: auto;
+        min-height: 600px;
+    }
+
+    .canvas-container {
+        width: 100%;
+        max-width: 405px;
+        height: auto;
+        min-height: 600px;
+        max-height: none;
+    }
+
+    .content-display {
+        padding: 15px;
+    }
+}
+
+/* Responsividade para Mobile - iPhone e similar */
+@media (max-width: 430px) {
+    body {
+        padding: 5px;
+        font-size: 14px;
+    }
+
+    .container {
+        gap: 10px;
+        height: auto;
+    }
+
+    .control-panel {
+        padding: 15px;
+        border-radius: 12px;
+        border-width: 2px;
+    }
+
+    .control-panel h1 {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+    }
+
+    .input-section label {
+        font-size: 1.1em;
+        margin-bottom: 8px;
+    }
+
+    #textInput {
+        font-size: 0.95em;
+        padding: 10px;
+        border-width: 2px;
+        border-radius: 8px;
+    }
+
+    .btn-primary, .btn-play, .btn-pause, .btn-reset {
+        padding: 10px 15px;
+        font-size: 1.1em;
+        border-width: 2px;
+        border-radius: 8px;
+    }
+
+    .status-message {
+        padding: 12px;
+        font-size: 1em;
+        border-width: 2px;
+    }
+
+    .time-controls h3 {
+        font-size: 1.3em;
+        margin-bottom: 12px;
+    }
+
+    .time-controls p {
+        font-size: 0.85em;
+        margin-bottom: 12px;
+    }
+
+    .timing-item {
+        padding: 10px;
+        border-width: 2px;
+        margin-bottom: 8px;
+    }
+
+    .timing-item label {
+        font-size: 0.95em;
+    }
+
+    .timing-item input {
+        padding: 6px;
+        font-size: 0.95em;
+        border-width: 2px;
+    }
+
+    .keyboard-hint {
+        padding: 10px;
+        font-size: 1em;
+        border-width: 2px;
+        margin: 12px 0;
+    }
+
+    .keyboard-hint strong {
+        padding: 3px 10px;
+        font-size: 1.1em;
+    }
+
+    .progress-bar {
+        height: 25px;
+        border-width: 2px;
+        margin-top: 12px;
+    }
+
+    .presentation-area {
+        padding: 10px;
+        border-radius: 15px;
+        border-width: 2px;
+        height: auto;
+        min-height: 500px;
+    }
+
+    .canvas-container {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        min-height: 500px;
+        max-height: 700px;
+        border-width: 3px;
+        border-radius: 15px;
+    }
+
+    .content-display {
+        padding: 12px;
+    }
+
+    .placeholder {
+        padding: 30px 15px;
+    }
+
+    .placeholder h2 {
+        font-size: 1.6em;
+        margin-bottom: 15px;
+    }
+
+    .placeholder p {
+        font-size: 1em;
+    }
+
+    .content-element {
+        margin-bottom: 20px;
+        padding: 12px;
+        border-width: 2px;
+        border-radius: 12px;
+    }
+
+    .content-text {
+        font-size: 1.2em;
+        line-height: 1.4;
+    }
+
+    .highlight {
+        padding: 1px 4px;
+    }
+
+    .chart-container {
+        height: 250px;
+        margin-top: 12px;
+    }
+
+    .chart-title {
+        font-size: 1.4em;
+        margin-bottom: 8px;
+    }
+
+    .table-container {
+        margin-top: 12px;
+    }
+
+    table {
+        border-width: 2px;
+        border-radius: 8px;
+    }
+
+    th, td {
+        padding: 8px;
+        font-size: 0.9em;
+        border-bottom-width: 2px;
+    }
+
+    th {
+        font-size: 1.1em;
+    }
+
+    .list-container {
+        margin-top: 12px;
+    }
+
+    .list-container li {
+        font-size: 1.1em;
+        padding: 6px 0;
+        padding-left: 30px;
+    }
+
+    .list-container li:before {
+        font-size: 0.9em;
+    }
+
+    .math-expression {
+        font-size: 1.6em;
+        padding: 15px;
+        border-width: 2px;
+        margin: 12px 0;
+    }
+
+    .canvas-container::-webkit-scrollbar {
+        width: 6px;
+    }
+}
+
+/* Responsividade para iPhone SE e dispositivos pequenos */
+@media (max-width: 375px) {
+    body {
+        font-size: 13px;
+    }
+
+    .control-panel h1 {
+        font-size: 1.3em;
+    }
+
+    #textInput {
+        font-size: 0.9em;
+    }
+
+    .btn-primary, .btn-play, .btn-pause, .btn-reset {
+        padding: 8px 12px;
+        font-size: 1em;
+    }
+
+    .content-text {
+        font-size: 1.1em;
+    }
+
+    .chart-container {
+        height: 220px;
+    }
+
+    .chart-title {
+        font-size: 1.2em;
+    }
+
+    .math-expression {
+        font-size: 1.4em;
+        padding: 12px;
+    }
+}
+
+/* Landscape mode para mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+    .container {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr;
+    }
+
+    .control-panel {
+        max-height: calc(100vh - 20px);
+        overflow-y: auto;
+    }
+
+    .presentation-area {
+        max-height: calc(100vh - 20px);
+    }
+
+    .canvas-container {
+        height: calc(100vh - 40px);
+        max-height: none;
+    }
+}
+
+/* Ajustes para telas touch */
+@media (hover: none) and (pointer: coarse) {
+    .btn-primary, .btn-play, .btn-pause, .btn-reset {
+        min-height: 44px; /* Tamanho mínimo recomendado para touch */
+    }
+
+    .timing-item input {
+        min-height: 44px;
+    }
+
+    #textInput {
+        min-height: 44px;
+    }
+}

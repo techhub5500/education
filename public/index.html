@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Educacional - Conteúdo Visual IA</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-roughness@latest"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Painel de Controle -->
+        <div class="control-panel" id="controlPanel">
+            <h1>📚 Dashboard Educacional</h1>
+            
+            <div class="input-section">
+                <label for="textInput">Digite seu conteúdo:</label>
+                <textarea 
+                    id="textInput" 
+                    placeholder="Ex: No mês passado gastei 20 e neste mês gastei 30&#10;&#10;Ou: 20% vem do mercado financeiro, 15% do mercado de tecnologia e 11% do varejo&#10;&#10;Ou: 2 + 2 é igual a 4"
+                    rows="6"
+                ></textarea>
+                
+                <button id="processBtn" class="btn-primary">
+                    ✨ Gerar Conteúdo Visual
+                </button>
+            </div>
+
+            <div id="statusMessage" class="status-message hidden"></div>
+
+            <!-- Controles de Tempo -->
+            <div id="timeControls" class="time-controls hidden">
+                <h3>⚙️ Controle de Animações</h3>
+                <p style="font-size: 0.95em; margin-bottom: 15px; color: #666;">
+                    Ajuste a duração de cada animação abaixo
+                </p>
+                <div id="timingList" class="timing-list"></div>
+                
+                <div class="playback-controls">
+                    <button id="playBtn" class="btn-play">▶️ Iniciar Apresentação</button>
+                    <button id="pauseBtn" class="btn-pause hidden">⏸️ Modo Apresentação</button>
+                    <button id="resetBtn" class="btn-reset">🔄 Reiniciar</button>
+                </div>
+
+                <div class="keyboard-hint">
+                    ⌨️ Pressione <strong>ENTER</strong> para avançar
+                </div>
+
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Área de Apresentação -->
+        <div class="presentation-area" id="presentationArea">
+            <div class="canvas-container">
+                <div id="contentDisplay" class="content-display">
+                    <div class="placeholder">
+                        <h2>👋 Bem-vindo!</h2>
+                        <p>Digite seu conteúdo e clique em "Gerar Conteúdo Visual"</p>
+                        <p>A IA transformará seu texto em visualizações incríveis!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

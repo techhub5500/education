@@ -1,0 +1,12 @@
+services:
+  # Servidor Web (Express + Static Files)
+  - type: web
+    name: educacao-visual-dashboard
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DEEPSEEK_API_KEY
+        sync: false  # Você vai configurar isso manualmente no painel do Render
