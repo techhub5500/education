@@ -14,14 +14,18 @@
     --highlight-green: #aed581;
     --highlight-pink: #f48fb1;
     --highlight-blue: #81d4fa;
+    --glow-primary: rgba(74, 144, 226, 0.5);
+    --glow-success: rgba(39, 174, 96, 0.5);
+    --shadow-elevated: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent; /* Remove destaque azul no toque em iOS */
-    -webkit-touch-callout: none; /* Desabilita callout em iOS */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
 }
 
 body {
@@ -114,14 +118,34 @@ body {
 }
 
 .btn-primary {
-    background: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color) 0%, #357abd 100%);
     color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-primary:active::before {
+    width: 300px;
+    height: 300px;
 }
 
 .btn-primary:hover, .btn-primary:active {
-    background: #357abd;
+    background: linear-gradient(135deg, #357abd 0%, #2a5f8f 100%);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 0 20px var(--glow-primary);
 }
 
 .btn-play {
@@ -278,26 +302,26 @@ body {
 
 .canvas-container {
     /* Proporção 9:16 - Formato de celular para vídeo vertical */
-    width: 405px;  /* 9 unidades */
-    height: 720px; /* 16 unidades */
+    width: 405px;
+    height: 720px;
     max-height: calc(100vh - 100px);
-    background: var(--bg-white);
+    background: linear-gradient(135deg, #fefefe 0%, #f9f9fc 100%);
     border: 4px solid var(--text-dark);
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(102, 126, 234, 0.1);
+    overflow-y: scroll;
     overflow-x: hidden;
     position: relative;
-    /* Scroll suave e infinito */
     scroll-behavior: smooth;
-    scroll-padding: 48px; /* Aumentado 120% (de 20px para 48px) */
-    /* Melhor performance de scroll */
+    scroll-padding: 48px;
     -webkit-overflow-scrolling: touch;
-    /* Scroll sempre disponível */
     scrollbar-width: thin;
     scrollbar-color: var(--primary-color) var(--bg-light);
-    /* Forçar scrollbar sempre visível */
-    overflow-y: scroll;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.canvas-container:hover {
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35), 0 0 0 2px rgba(102, 126, 234, 0.2);
 }
 
 .content-display {
@@ -346,9 +370,18 @@ body {
 .content-element {
     margin-bottom: 30px;
     padding: 15px;
-    background: var(--bg-light);
+    background: linear-gradient(135deg, #fef9f3 0%, #fff5e8 100%);
     border-radius: 15px;
     border: 3px solid var(--text-dark);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02);
+    position: relative;
+    z-index: 1;
+    transform-style: preserve-3d;
+}
+
+.content-element:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(102, 126, 234, 0.1);
+    transform: translateZ(5px);
 }
 
 /* Animação Fade Slide (da esquerda para direita) */
@@ -371,9 +404,10 @@ body {
 .content-line {
     opacity: 0;
     transform: translateX(-30px) scale(0.95);
-    animation: linePopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation: linePopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, lineGlow 0.6s ease-out;
     margin-bottom: 8px;
     padding: 8px 0;
+    position: relative;
 }
 
 @keyframes linePopIn {
@@ -383,10 +417,51 @@ body {
     }
     60% {
         transform: translateX(5px) scale(1.02);
+        box-shadow: 0 0 20px var(--glow-success);
     }
     100% {
         opacity: 1;
         transform: translateX(0) scale(1);
+        box-shadow: none;
+    }
+}
+
+@keyframes lineGlow {
+    0% {
+        filter: drop-shadow(0 0 0px transparent);
+    }
+    50% {
+        filter: drop-shadow(0 0 8px var(--glow-success));
+    }
+    100% {
+        filter: drop-shadow(0 0 0px transparent);
+    }
+}
+
+/* Efeito de partículas ao aparecer */
+.content-line::after {
+    content: '✨';
+    position: absolute;
+    right: -30px;
+    top: 50%;
+    transform: translateY(-50%) scale(0);
+    opacity: 0;
+    animation: particleBurst 0.6s ease-out;
+    pointer-events: none;
+}
+
+@keyframes particleBurst {
+    0% {
+        transform: translateY(-50%) scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(-50%) scale(1.5) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-80%) scale(0) rotate(360deg);
+        opacity: 0;
     }
 }
 
@@ -431,26 +506,65 @@ body {
     position: relative;
     padding: 2px 6px;
     font-weight: bold;
+    display: inline-block;
+    animation: highlightPulse 2s ease-in-out infinite;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.highlight:hover {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+}
+
+@keyframes highlightPulse {
+    0%, 100% {
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+    50% {
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.15), 0 0 10px currentColor;
+    }
 }
 
 .highlight-yellow {
-    background: var(--highlight-yellow);
-    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, var(--highlight-yellow) 0%, #ffeb99 100%);
+    color: #856404;
+    --glow-color: rgba(255, 241, 118, 0.5);
 }
 
 .highlight-green {
-    background: var(--highlight-green);
-    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, var(--highlight-green) 0%, #c5e8a0 100%);
+    color: #2d5016;
+    --glow-color: rgba(174, 213, 129, 0.5);
 }
 
 .highlight-pink {
-    background: var(--highlight-pink);
-    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, var(--highlight-pink) 0%, #faa5c7 100%);
+    color: #6d1b3d;
+    --glow-color: rgba(244, 143, 177, 0.5);
 }
 
 .highlight-blue {
-    background: var(--highlight-blue);
-    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, var(--highlight-blue) 0%, #9ee4ff 100%);
+    color: #014361;
+    --glow-color: rgba(129, 212, 250, 0.5);
+}
+
+/* Glow effect nos highlights */
+.content-line .highlight {
+    animation: highlightPulse 2s ease-in-out infinite, highlightGlow 1.5s ease-out;
+}
+
+@keyframes highlightGlow {
+    0% {
+        filter: brightness(1) drop-shadow(0 0 0px transparent);
+    }
+    30% {
+        filter: brightness(1.2) drop-shadow(0 0 8px var(--glow-color));
+    }
+    100% {
+        filter: brightness(1) drop-shadow(0 0 0px transparent);
+    }
 }
 
 .chart-container {
@@ -542,6 +656,23 @@ tr:nth-child(even) {
     display: none;
 }
 
+/* Ripple effect */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(102, 126, 234, 0.5);
+    transform: scale(0);
+    animation: rippleEffect 0.6s ease-out;
+    pointer-events: none;
+}
+
+@keyframes rippleEffect {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
 /* Fullscreen mode */
 .presentation-area.fullscreen {
     position: fixed;
@@ -566,6 +697,16 @@ tr:nth-child(even) {
     max-height: 100%;
     border-radius: 0;
     border: none;
+    animation: borderPulse 3s ease-in-out infinite;
+}
+
+@keyframes borderPulse {
+    0%, 100% {
+        box-shadow: inset 0 0 0 2px rgba(102, 126, 234, 0.3);
+    }
+    50% {
+        box-shadow: inset 0 0 0 2px rgba(102, 126, 234, 0.6);
+    }
 }
 
 /* Prevenir scroll/bounce no iOS durante apresentação */
@@ -631,10 +772,12 @@ body.presentation-active {
     .container {
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr;
+        transition: all 0.3s ease;
     }
     
     .control-panel {
         max-height: 400px;
+        transition: max-height 0.3s ease;
     }
 }
 

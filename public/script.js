@@ -41,6 +41,9 @@ elements.contentDisplay.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
     
+    // Criar ripple effect
+    createRipple(event);
+    
     const clickX = event.clientX || event.touches?.[0]?.clientX;
     const screenWidth = window.innerWidth;
     const clickPosition = clickX / screenWidth;
@@ -414,6 +417,27 @@ function scrollToNewLine(lineElement) {
             });
         });
     }
+}
+
+// Criar ripple effect no clique
+function createRipple(event) {
+    const container = event.currentTarget;
+    const ripple = document.createElement('span');
+    ripple.classList.add('ripple');
+    
+    const rect = container.getBoundingClientRect();
+    const x = (event.clientX || event.touches?.[0]?.clientX) - rect.left;
+    const y = (event.clientY || event.touches?.[0]?.clientY) - rect.top;
+    
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+    ripple.style.width = ripple.style.height = '10px';
+    
+    container.appendChild(ripple);
+    
+    setTimeout(() => {
+        ripple.remove();
+    }, 600);
 }
 
 // Entrar em fullscreen (mobile)
