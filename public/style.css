@@ -495,7 +495,7 @@ body {
 }
 
 .content-text {
-    font-size: 2.67em;  /* 70% maior que 1.57em (1.57 * 1.7 ≈ 2.67) */
+    font-size: 2.97em;  /* 70% maior que 1.57em (1.57 * 1.7 ≈ 2.67) */
     line-height: 1.65;  /* 10% maior que 1.5 */
     color: var(--text-dark);
     white-space: pre-wrap; /* Preserva quebras de linha e espaços */
@@ -1325,7 +1325,7 @@ body {
     }
 
     .content-text {
-        font-size: 1.87em;  /* 1.1em * 1.7 ≈ 1.87em (70% maior) */
+        font-size: 2.47em;  /* 1.1em * 1.7 ≈ 1.87em (70% maior) */
     }
 
     .chart-container {
