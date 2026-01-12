@@ -392,9 +392,9 @@ function scrollToNewLine(lineElement) {
     const lineTop = lineRect.top - containerRect.top + canvasContainer.scrollTop;
     const lineBottom = lineTop + lineRect.height;
     
-    // Margem de segurança (pixels) - aumenta com mais conteúdo
+    // Margem de segurança aumentada em 120% (antes era até 100px ou 10%, agora até 220px ou 22%)
     const totalContentHeight = canvasContainer.scrollHeight;
-    const margin = Math.min(100, totalContentHeight * 0.1); // Máximo 100px ou 10% do conteúdo
+    const margin = Math.min(220, totalContentHeight * 0.22); // 120% de aumento na margem
     
     // Verificar se a linha está completamente visível
     const containerTop = canvasContainer.scrollTop;
@@ -402,8 +402,9 @@ function scrollToNewLine(lineElement) {
     
     // Se a linha não está completamente visível, fazer scroll
     if (lineTop < containerTop + margin || lineBottom > containerBottom - margin) {
-        // Calcular posição ideal (linha no centro da tela, mas não ultrapassar o topo)
-        const idealScrollTop = Math.max(0, lineTop - (containerRect.height / 2) + (lineRect.height / 2));
+        // Calcular posição ideal (linha mais centralizada na tela)
+        const centerOffset = containerRect.height * 0.4; // Mantém mais no centro (40% da altura)
+        const idealScrollTop = Math.max(0, lineTop - centerOffset);
         
         // Usar requestAnimationFrame para melhor performance
         requestAnimationFrame(() => {

@@ -290,7 +290,7 @@ body {
     position: relative;
     /* Scroll suave e infinito */
     scroll-behavior: smooth;
-    scroll-padding: 20px;
+    scroll-padding: 48px; /* Aumentado 120% (de 20px para 48px) */
     /* Melhor performance de scroll */
     -webkit-overflow-scrolling: touch;
     /* Scroll sempre disponível */
@@ -302,11 +302,12 @@ body {
 
 .content-display {
     min-height: 100%;
-    padding: 20px;
+    padding: 48px; /* 20px * 2.4 = 48px (120% de aumento) */
     /* Melhor distribuição de conteúdo para scroll infinito */
     display: flex;
     flex-direction: column;
     gap: 15px;
+    margin-bottom: 150px;
     /* Garantir que o conteúdo possa crescer indefinidamente */
     min-height: fit-content;
     /* Garantir altura mínima para scroll sempre disponível */
@@ -683,7 +684,7 @@ body.presentation-active {
     }
 
     .content-display {
-        padding: 15px;
+        padding: 36px; /* 15px * 2.4 = 36px (120% de aumento) */
     }
 }
 
@@ -798,7 +799,7 @@ body.presentation-active {
     }
 
     .content-display {
-        padding: 12px;
+        padding: 28px 36px; /* 12px * 2.4 = 28px vertical, 15px * 2.4 = 36px horizontal */
     }
 
     .placeholder {
