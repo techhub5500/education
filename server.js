@@ -30,52 +30,68 @@ app.post('/api/process', async (req, res) => {
     }
 
     // Prompt para a IA gerar conteúdo estruturado
-    const systemPrompt = `Você é um assistente especializado em criar conteúdo educacional visual.
-Analise o texto fornecido e retorne um JSON estruturado com elementos visuais.
+    const systemPrompt = `Você é um especialista em criar conteúdo visual educacional para apresentações narradas.
 
-Tipos de elementos disponíveis:
-1. "text" - Texto com destaques e marcações
-2. "chart" - Gráficos (bar, pie, line)
-3. "table" - Tabelas organizadas
-4. "list" - Listas com bullets
-5. "math" - Expressões matemáticas
+CONTEXTO IMPORTANTE:
+- O texto fornecido será NARRADO por uma pessoa
+- Você deve criar elementos visuais que ACOMPANHEM e REFORCEM a narração
+- Os visuais aparecem enquanto a pessoa fala
+- Priorize clareza e impacto visual
 
-Para cada elemento, forneça:
-- type: tipo do elemento
-- content: conteúdo específico
-- duration: tempo sugerido em segundos para exibição
-- highlights: palavras ou números para destacar com cores
+TIPOS DE ELEMENTOS:
+1. "text" - Frases-chave, conceitos importantes, definições
+2. "chart" - APENAS para dados numéricos concretos e comparações quantitativas
+3. "table" - Comparações lado a lado, antes/depois, pros/contras
+4. "list" - Passos, pontos principais, sequências
 
-Exemplo de resposta JSON:
+REGRAS DE OURO:
+✅ Use "text" com highlights para conceitos-chave e frases de impacto
+✅ Use "list" para enumerar pontos, passos ou estratégias
+✅ Use "table" para comparar duas ou mais opções/cenários
+❌ SÓ use "chart" se houver dados numéricos REAIS e relevantes
+❌ NÃO invente gráficos se não houver dados concretos para visualizar
+❌ NÃO force visualizações que não agregam valor
+
+ANÁLISE DO TEXTO:
+1. Identifique os 3-5 pontos principais
+2. Decida qual formato visual melhor representa cada ponto
+3. Destaque palavras-chave e números importantes
+4. Crie elementos que complementem a fala, não que compitam com ela
+
+ESTRUTURA DA RESPOSTA:
 {
   "elements": [
     {
-      "type": "text",
-      "content": "2 + 2 é igual a 4",
-      "highlights": ["2", "4"],
+      "type": "text|list|table|chart",
+      "content": "conteúdo do elemento",
+      "highlights": ["palavras", "para", "destacar"],
       "animation": {
-        "type": "fadeSlide",
         "duration": 1.5
-      }
-    },
-    {
-      "type": "chart",
-      "chartType": "bar",
-      "data": {
-        "labels": ["Mês passado", "Este mês"],
-        "values": [20, 30]
-      },
-      "title": "Comparação de Gastos",
-      "animation": {
-        "duration": 2.5
       }
     }
   ]
 }
 
-Para textos, use animation.type "fadeSlide" e duration entre 1 a 3 segundos.
-Para gráficos, use duration entre 2 a 4 segundos para animação progressiva.
-Sempre identifique números, percentuais e dados numéricos para criar gráficos apropriados.
+EXEMPLOS DE USO CORRETO:
+
+Texto sobre estratégia financeira (SEM dados numéricos):
+→ Use "text" para conceito principal + "list" para passos
+
+Texto com comparação "rico vs pobre":
+→ Use "table" com 2 colunas comparando comportamentos
+
+Texto com dados "gastei R$100 e agora R$150":
+→ Use "chart" tipo "bar" com valores reais
+
+Texto conceitual sobre mindset:
+→ Use "text" destacando frases de impacto
+
+DURAÇÃO DAS ANIMAÇÕES:
+- text: 1.2 a 2.0 segundos
+- list: 1.5 a 2.5 segundos  
+- table: 2.0 a 3.0 segundos
+- chart: 2.5 a 3.5 segundos
+
 Retorne APENAS o JSON, sem texto adicional.`;
 
     const response = await axios.post(
