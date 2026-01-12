@@ -1,8 +1,10 @@
 // Estado da aplicação
 let currentContent = null;
 let currentElementIndex = 0;
+let currentLineIndex = 0; // Controla qual linha do elemento atual está sendo mostrada
 let isPresentationMode = false;
 let charts = [];
+let currentElementContainer = null; // Container do elemento atual
 
 // Elementos do DOM
 const elements = {
@@ -181,18 +183,25 @@ function startPresentation() {
     
     elements.contentDisplay.innerHTML = '';
     currentElementIndex = 0;
+    currentLineIndex = 0;
+    currentElementContainer = null;
     elements.progressFill.style.width = '0%';
     
     // Ativar fullscreen no mobile
     enterFullscreen();
     
     showStatus('📺 Modo Apresentação: Pressione ENTER para avançar', 'success');
+    
+    // Mostrar primeira linha do primeiro elemento
+    showNextLine();
 }
 
 // Resetar apresentação
 function resetPresentation() {
     isPresentationMode = false;
     currentElementIndex = 0;
+    currentLineIndex = 0;
+    currentElementContainer = null;
     elements.contentDisplay.innerHTML = '';
     elements.progressFill.style.width = '0%';
     elements.playBtn.classList.remove('hidden');
@@ -206,49 +215,134 @@ function resetPresentation() {
     charts = [];
 }
 
-// Mostrar próximo elemento
-function showNextElement() {
-    if (!isPresentationMode || !currentContent || currentElementIndex >= currentContent.elements.length) {
-        if (currentElementIndex >= currentContent.elements.length) {
-            isPresentationMode = false;
-            showStatus('✅ Apresentação concluída!', 'success');
-            elements.playBtn.classList.remove('hidden');
-            elements.pauseBtn.classList.add('hidden');
-        }
+// Mostrar próxima linha
+function showNextLine() {
+    if (!isPresentationMode || !currentContent) return;
+    
+    // Verificar se chegou ao fim
+    if (currentElementIndex >= currentContent.elements.length) {
+        isPresentationMode = false;
+        showStatus('✅ Apresentação concluída!', 'success');
+        elements.playBtn.classList.remove('hidden');
+        elements.pauseBtn.classList.add('hidden');
         return;
     }
     
     const element = currentContent.elements[currentElementIndex];
-    renderElement(element);
+    const lines = element.content.split('\n').filter(line => line.trim() !== '');
     
-    // Atualizar barra de progresso
-    const progress = ((currentElementIndex + 1) / currentContent.elements.length) * 100;
-    elements.progressFill.style.width = `${progress}%`;
+    // Se não há container ou é um novo elemento, criar container
+    if (!currentElementContainer || currentLineIndex === 0) {
+        currentElementContainer = createElementContainer(element);
+        elements.contentDisplay.appendChild(currentElementContainer);
+    }
     
-    currentElementIndex++;
+    // Mostrar linha atual
+    if (currentLineIndex < lines.length) {
+        renderLine(lines[currentLineIndex], currentElementContainer, element.highlights || []);
+        currentLineIndex++;
+    }
+    
+    // Se terminou as linhas deste elemento, preparar para próximo
+    if (currentLineIndex >= lines.length) {
+        currentElementIndex++;
+        currentLineIndex = 0;
+        currentElementContainer = null;
+        
+        // Atualizar barra de progresso
+        const progress = (currentElementIndex / currentContent.elements.length) * 100;
+        elements.progressFill.style.width = `${progress}%`;
+    }
 }
 
-// Mostrar elemento anterior
+// Mostrar próximo elemento (mantido para compatibilidade)
+function showNextElement() {
+    showNextLine();
+}
+
+// Mostrar linha anterior
 function showPreviousElement() {
     if (!isPresentationMode || !currentContent) return;
     
-    // Se está no primeiro, não faz nada
-    if (currentElementIndex === 0) return;
+    // Se está na primeira linha do primeiro elemento, não faz nada
+    if (currentElementIndex === 0 && currentLineIndex === 0) return;
     
-    // Remove o último elemento renderizado
-    const lastChild = elements.contentDisplay.lastElementChild;
-    if (lastChild) {
-        lastChild.remove();
+    // Se está no meio de um elemento, voltar uma linha
+    if (currentLineIndex > 0) {
+        // Remove a última linha renderizada
+        const lastLine = currentElementContainer?.lastElementChild;
+        if (lastLine && lastLine.classList.contains('content-line')) {
+            lastLine.remove();
+            currentLineIndex--;
+        }
+    } else {
+        // Está no início de um elemento, voltar para o elemento anterior
+        if (currentElementIndex > 0) {
+            // Remover container atual
+            if (currentElementContainer) {
+                currentElementContainer.remove();
+                currentElementContainer = null;
+            }
+            
+            currentElementIndex--;
+            
+            // Encontrar quantas linhas tem o elemento anterior
+            const prevElement = currentContent.elements[currentElementIndex];
+            const prevLines = prevElement.content.split('\n').filter(line => line.trim() !== '');
+            
+            // Voltar para o container anterior e remover última linha
+            currentElementContainer = elements.contentDisplay.lastElementChild;
+            if (currentElementContainer) {
+                const lastLine = currentElementContainer.lastElementChild;
+                if (lastLine) {
+                    lastLine.remove();
+                    currentLineIndex = prevLines.length - 1;
+                }
+            }
+            
+            // Atualizar barra de progresso
+            const progress = (currentElementIndex / currentContent.elements.length) * 100;
+            elements.progressFill.style.width = `${progress}%`;
+        }
     }
-    
-    currentElementIndex--;
-    
-    // Atualizar barra de progresso
-    const progress = (currentElementIndex / currentContent.elements.length) * 100;
-    elements.progressFill.style.width = `${progress}%`;
 }
 
-// Renderizar elemento
+// Criar container para elemento
+function createElementContainer(element) {
+    const container = document.createElement('div');
+    container.className = 'content-element';
+    
+    const animationDuration = element.animation?.duration || 1.5;
+    container.style.setProperty('--animation-duration', `${animationDuration}s`);
+    
+    return container;
+}
+
+// Renderizar uma linha individual
+function renderLine(lineText, container, highlights) {
+    const lineDiv = document.createElement('div');
+    lineDiv.className = 'content-line line-animation';
+    
+    let content = lineText;
+    const colors = ['highlight-yellow', 'highlight-green', 'highlight-pink', 'highlight-blue'];
+    
+    // Aplicar destaques
+    highlights.forEach((word, index) => {
+        const color = colors[index % colors.length];
+        const regex = new RegExp(`(${escapeRegex(word)})`, 'gi');
+        content = content.replace(regex, `<span class="highlight ${color}">$1</span>`);
+    });
+    
+    lineDiv.innerHTML = content;
+    container.appendChild(lineDiv);
+    
+    // Scroll suave e inteligente para a nova linha
+    setTimeout(() => {
+        scrollToNewLine(lineDiv);
+    }, 50);
+}
+
+// Renderizar elemento (mantido para compatibilidade)
 function renderElement(element) {
     const container = document.createElement('div');
     container.className = 'content-element fade-slide-animation';
@@ -286,6 +380,39 @@ function renderText(element, container) {
 // Escapar caracteres especiais para regex
 function escapeRegex(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Scroll inteligente para nova linha
+function scrollToNewLine(lineElement) {
+    const canvasContainer = document.querySelector('.canvas-container');
+    const containerRect = canvasContainer.getBoundingClientRect();
+    const lineRect = lineElement.getBoundingClientRect();
+    
+    // Calcular posição relativa ao container
+    const lineTop = lineRect.top - containerRect.top + canvasContainer.scrollTop;
+    const lineBottom = lineTop + lineRect.height;
+    
+    // Margem de segurança (pixels) - aumenta com mais conteúdo
+    const totalContentHeight = canvasContainer.scrollHeight;
+    const margin = Math.min(100, totalContentHeight * 0.1); // Máximo 100px ou 10% do conteúdo
+    
+    // Verificar se a linha está completamente visível
+    const containerTop = canvasContainer.scrollTop;
+    const containerBottom = containerTop + containerRect.height;
+    
+    // Se a linha não está completamente visível, fazer scroll
+    if (lineTop < containerTop + margin || lineBottom > containerBottom - margin) {
+        // Calcular posição ideal (linha no centro da tela, mas não ultrapassar o topo)
+        const idealScrollTop = Math.max(0, lineTop - (containerRect.height / 2) + (lineRect.height / 2));
+        
+        // Usar requestAnimationFrame para melhor performance
+        requestAnimationFrame(() => {
+            canvasContainer.scrollTo({
+                top: idealScrollTop,
+                behavior: 'smooth'
+            });
+        });
+    }
 }
 
 // Entrar em fullscreen (mobile)
