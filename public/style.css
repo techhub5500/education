@@ -495,8 +495,8 @@ body {
 }
 
 .content-text {
-    font-size: 2.97em;  /* 70% maior que 1.57em (1.57 * 1.7 ≈ 2.67) */
-    line-height: 1.65;  /* 10% maior que 1.5 */
+    font-size: 5em;  /* Fonte bem grande para melhor legibilidade */
+    line-height: 1.4;  /* Line-height ajustado para fonte maior */
     color: var(--text-dark);
     white-space: pre-wrap; /* Preserva quebras de linha e espaços */
     word-wrap: break-word;
@@ -1105,6 +1105,11 @@ body {
     .content-display {
         padding: 36px; /* 15px * 2.4 = 36px (120% de aumento) */
     }
+
+    .content-text {
+        font-size: 4.5em;  /* Fonte grande para tablets */
+        line-height: 1.4;
+    }
 }
 
 /* Responsividade para Mobile - iPhone e similar */
@@ -1242,6 +1247,11 @@ body {
     }
 
     .content-text {
+        font-size: 4em;  /* Fonte grande para mobile */
+        line-height: 1.35;
+    }
+
+    .content-text {
         font-size: 2.83em;  /* 1.661em * 1.7 ≈ 2.83em (70% maior) */
         line-height: 1.54;  /* 10% maior que 1.4 */
     }
@@ -1325,7 +1335,8 @@ body {
     }
 
     .content-text {
-        font-size: 2.47em;  /* 1.1em * 1.7 ≈ 1.87em (70% maior) */
+        font-size: 3.5em;  /* Fonte grande para telas pequenas */
+        line-height: 1.35;
     }
 
     .chart-container {
