@@ -14,10 +14,33 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'seu-secret-key-aqui-mude-em-producao';
 
+// Verificar variáveis de ambiente obrigatórias
+if (!process.env.MONGO_URI) {
+  console.error('❌ ERRO CRÍTICO: Variável de ambiente MONGO_URI não configurada!');
+  console.error('📋 Configure no Render: Environment → Environment Variables');
+  console.error('📋 Adicione: MONGO_URI=mongodb+srv://...');
+  process.exit(1);
+}
+
+if (!process.env.DEEPSEEK_API_KEY) {
+  console.error('⚠️ AVISO: Variável DEEPSEEK_API_KEY não configurada');
+}
+
 // Conectar ao MongoDB
+console.log('🔌 Conectando ao MongoDB...');
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('✅ MongoDB conectado'))
-  .catch(err => console.error('❌ Erro ao conectar MongoDB:', err));
+  .then(() => {
+    console.log('✅ MongoDB conectado com sucesso!');
+    console.log('📦 Banco de dados pronto');
+  })
+  .catch(err => {
+    console.error('❌ Erro ao conectar MongoDB:', err.message);
+    console.error('💡 Verifique se:');
+    console.error('   1. A string de conexão está correta');
+    console.error('   2. O IP do Render está autorizado no MongoDB Atlas (0.0.0.0/0)');
+    console.error('   3. Usuário e senha estão corretos');
+    process.exit(1);
+  });
 
 app.use(cors());
 app.use(express.json());

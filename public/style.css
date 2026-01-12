@@ -495,7 +495,7 @@ body {
 }
 
 .content-text {
-    font-size: 1.57em;  /* 12% maior que 1.4em */
+    font-size: 2.67em;  /* 70% maior que 1.57em (1.57 * 1.7 ≈ 2.67) */
     line-height: 1.65;  /* 10% maior que 1.5 */
     color: var(--text-dark);
     white-space: pre-wrap; /* Preserva quebras de linha e espaços */
@@ -1242,7 +1242,7 @@ body {
     }
 
     .content-text {
-        font-size: 1.661em;  /* 1.34em * 1.15 = 1.541em (15% maior) */
+        font-size: 2.83em;  /* 1.661em * 1.7 ≈ 2.83em (70% maior) */
         line-height: 1.54;  /* 10% maior que 1.4 */
     }
 
@@ -1325,7 +1325,7 @@ body {
     }
 
     .content-text {
-        font-size: 1.1em;
+        font-size: 1.87em;  /* 1.1em * 1.7 ≈ 1.87em (70% maior) */
     }
 
     .chart-container {
