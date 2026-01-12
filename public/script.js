@@ -35,6 +35,10 @@ document.addEventListener('keydown', (event) => {
 elements.contentDisplay.addEventListener('click', (event) => {
     if (!isPresentationMode) return;
     
+    // Prevenir comportamento padrão (scroll, zoom, etc)
+    event.preventDefault();
+    event.stopPropagation();
+    
     const clickX = event.clientX || event.touches?.[0]?.clientX;
     const screenWidth = window.innerWidth;
     const clickPosition = clickX / screenWidth;
@@ -48,6 +52,13 @@ elements.contentDisplay.addEventListener('click', (event) => {
         showNextElement();
     }
 });
+
+// Prevenir scroll durante toque no content display
+elements.contentDisplay.addEventListener('touchmove', (event) => {
+    if (isPresentationMode) {
+        event.preventDefault();
+    }
+}, { passive: false });
 
 // Função para processar o conteúdo
 async function processContent() {
@@ -172,6 +183,9 @@ function startPresentation() {
     currentElementIndex = 0;
     elements.progressFill.style.width = '0%';
     
+    // Ativar fullscreen no mobile
+    enterFullscreen();
+    
     showStatus('📺 Modo Apresentação: Pressione ENTER para avançar', 'success');
 }
 
@@ -183,6 +197,9 @@ function resetPresentation() {
     elements.progressFill.style.width = '0%';
     elements.playBtn.classList.remove('hidden');
     elements.pauseBtn.classList.add('hidden');
+    
+    // Sair do fullscreen
+    exitFullscreen();
     
     // Limpar gráficos anteriores
     charts.forEach(chart => chart.destroy());
@@ -270,6 +287,67 @@ function renderText(element, container) {
 function escapeRegex(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
+
+// Entrar em fullscreen (mobile)
+function enterFullscreen() {
+    const presentationArea = document.querySelector('.presentation-area');
+    
+    // Prevenir scroll no body
+    document.body.classList.add('presentation-active');
+    
+    // Adicionar classe fullscreen
+    presentationArea.classList.add('fullscreen');
+    
+    // Tentar usar Fullscreen API (funciona melhor em alguns navegadores)
+    if (presentationArea.requestFullscreen) {
+        presentationArea.requestFullscreen().catch(err => {
+            console.log('Fullscreen API não disponível:', err);
+        });
+    } else if (presentationArea.webkitRequestFullscreen) {
+        presentationArea.webkitRequestFullscreen();
+    } else if (presentationArea.mozRequestFullScreen) {
+        presentationArea.mozRequestFullScreen();
+    } else if (presentationArea.msRequestFullscreen) {
+        presentationArea.msRequestFullscreen();
+    }
+}
+
+// Sair do fullscreen
+function exitFullscreen() {
+    const presentationArea = document.querySelector('.presentation-area');
+    
+    // Remover prevenção de scroll
+    document.body.classList.remove('presentation-active');
+    
+    // Remover classe fullscreen
+    presentationArea.classList.remove('fullscreen');
+    
+    // Sair do Fullscreen API
+    if (document.exitFullscreen) {
+        document.exitFullscreen().catch(err => {
+            console.log('Não estava em fullscreen:', err);
+        });
+    } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+    } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+    }
+}
+
+// Listener para sair do fullscreen quando ESC é pressionado
+document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement) {
+        resetPresentation();
+    }
+});
+
+document.addEventListener('webkitfullscreenchange', () => {
+    if (!document.webkitFullscreenElement) {
+        resetPresentation();
+    }
+});
 
 // Log inicial
 console.log('🎨 Dashboard Educacional carregado!');

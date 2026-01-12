@@ -338,8 +338,8 @@ body {
 }
 
 .content-text {
-    font-size: 1.4em;
-    line-height: 1.5;
+    font-size: 1.57em;  /* 12% maior que 1.4em */
+    line-height: 1.65;  /* 10% maior que 1.5 */
     color: var(--text-dark);
     white-space: pre-wrap; /* Preserva quebras de linha e espaços */
     word-wrap: break-word;
@@ -458,6 +458,40 @@ tr:nth-child(even) {
 /* Utility Classes */
 .hidden {
     display: none;
+}
+
+/* Fullscreen mode */
+.presentation-area.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg-white);
+}
+
+.presentation-area.fullscreen .canvas-container {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    border: none;
+}
+
+/* Prevenir scroll/bounce no iOS durante apresentação */
+body.presentation-active {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
 }
 
 /* Scrollbar customizada para o canvas */
@@ -696,8 +730,8 @@ tr:nth-child(even) {
     }
 
     .content-text {
-        font-size: 1.2em;
-        line-height: 1.4;
+        font-size: 1.34em;  /* 12% maior que 1.2em */
+        line-height: 1.54;  /* 10% maior que 1.4 */
     }
 
     .highlight {
