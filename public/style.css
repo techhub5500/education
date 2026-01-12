@@ -307,7 +307,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    margin-bottom: 150px;
+    margin-bottom: 240px; /* 150px * 1.6 = 240px (60% de aumento) */
     /* Garantir que o conteúdo possa crescer indefinidamente */
     min-height: fit-content;
     /* Garantir altura mínima para scroll sempre disponível */
@@ -823,7 +823,7 @@ body.presentation-active {
     }
 
     .content-text {
-        font-size: 1.34em;  /* 12% maior que 1.2em */
+        font-size: 1.541em;  /* 1.34em * 1.15 = 1.541em (15% maior) */
         line-height: 1.54;  /* 10% maior que 1.4 */
     }
 
