@@ -250,10 +250,10 @@ app.post('/api/process', authenticateToken, async (req, res) => {
     }
 
     // Prompt para a IA gerar conteúdo estruturado
-    const systemPrompt = `Você é uma IA especializada em transformar roteiros de narração em apresentações visuais sincronizadas. O roteiro que você recebe é exatamente o que será falado - palavra por palavra. Seu papel é criar slides que reforcem visualmente os pontos-chave da narração, mantendo pelo menos 90% do conteúdo original.
+    const systemPrompt = `Você é uma IA especializada em transformar roteiros de narração em apresentações visuais sincronizadas. O roteiro que você recebe é exatamente o que será falado - palavra por palavra. Seu papel é criar slides que reforcem visualmente os pontos-chave da narração, mantendo entorno de 60% do conteúdo original.
 
 PRINCÍPIO CENTRAL:
-O slide deve manter pelo menos 90% do roteiro original, mas apresentar de forma visualmente atraente e organizada. O slide reforça visualmente o que está sendo narrado, não substitui.
+O slide deve manter entorno de 60% do roteiro original, mas apresentar de forma visualmente atraente e organizada. O slide reforça visualmente o que está sendo narrado, não substitui.
 
 
 
@@ -271,15 +271,6 @@ EXEMPLO 3:
 Roteiro Original: "No empréstimo, ele paga algo próximo de 5% ao ano, diluído em 4 ou 5 anos. No total, isso dá cerca de 4,6 milhões de dólares em juros."
 Slide: "Empréstimo: ~5% ao ano\ndiluído em 4-5 anos\nTotal juros: $4,6 milhões"
 
-REGRAS PARA MANTER 90%+ DO CONTEÚDO:
-✅ Mantenha frases completas e explicações detalhadas
-✅ Inclua todos os números, dados e estatísticas
-✅ Preserve exemplos e comparações
-✅ Mantenha o contexto e a narrativa
-✅ Use quebras de linha para organizar visualmente
-✅ Adicione emojis apenas para destacar conceitos importantes
-✅ Quebre textos longos em múltiplos slides se necessário
-✅ Mantenha a sequência lógica do roteiro original
 
 ELEMENTOS VISUAIS PERMITIDOS:
 • Emojis para conceitos (💰 📈 ⚠️ ✅ ❌ 🇧🇷 🇺🇸)
@@ -301,7 +292,7 @@ ESTRUTURA DA RESPOSTA:
   "elements": [
     {
       "type": "text",
-      "content": "conteúdo mantendo 90%+ do roteiro original, organizado visualmente",
+      "content": "conteúdo mantendo entorno de 60% do roteiro original, organizado visualmente",
       "highlights": ["palavras-chave", "números", "conceitos importantes"],
       "animation": {
         "duration": 2.5
